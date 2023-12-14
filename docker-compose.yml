@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7.0.4
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: nahid
+      MONGO_INITDB_ROOT_PASSWORD: nahidpassword
+
+  # Admin interface for mongo
+  # For development purpose only
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: nahid
+      ME_CONFIG_MONGODB_ADMINPASSWORD: nahidpassword
+      ME_CONFIG_MONGODB_URL: mongodb://nahid:nahidpassword@mongo:27017/
+
+  fastapi:
+    build: .
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    ports:
+      - 8181:8000
+    volumes:
+      - ./:/app
