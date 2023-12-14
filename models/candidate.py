@@ -1,11 +1,13 @@
+from typing import Optional
+import uuid
 from pydantic import BaseModel, Field
 
 
 class CandidateModel(BaseModel):
     """Represents a candidate profile"""
 
-    id: str = Field(alias="_id")
-    UUID: str
+    id: Optional[str] = Field(alias="_id", default=None)
+    UUID: Optional[str] = Field(default_factory=uuid.uuid4)
     first_name: str
     last_name: str
     email: str
