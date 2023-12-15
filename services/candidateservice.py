@@ -7,7 +7,10 @@ class CandidateService:
         self.candidate_repo = candidate_repo
 
     def create_candidate(self, candidate: CandidateModel) -> CandidateModel:
-        return candidate
+        candidate_dict = candidate.model_dump(by_alias=True, exclude=["id"])
+        _id = self.candidate_repo.create(candidate_dict)
+        new_candidate = self.candidate_repo.find_one(_id)
+        return CandidateModel(**new_candidate)
 
     def update_candidate(
         self, updated_candidate: UpdateCandidateModel
@@ -27,4 +30,7 @@ class CandidateService:
         pass
 
     def global_search_candiates(self):
+        pass
+
+    def generate_report(self):
         pass

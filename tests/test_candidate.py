@@ -1,11 +1,16 @@
 import unittest
 from fastapi.testclient import TestClient
+from config import db, get_database
 from main import app
 from models import CandidateModel
 
 
 class TestUser(unittest.TestCase):
     def setUp(self):
+        db.init_db(
+            "mongodb://nahidtest:nahidpasswordtest@localhost:89/?retryWrites=true&w=majority"
+        )
+        self.db = get_database()
         self.client = TestClient(app)
 
     def test_create_candidate(self):
@@ -26,6 +31,7 @@ class TestUser(unittest.TestCase):
 
         response = self.client.post("/candidate", json=new_candidate)
         self.assertEqual(response.status_code, 201)
+        self.assertTrue(response.json()["id"])
 
     def test_update_candidate(self):
         update_candidate = dict(
@@ -77,6 +83,10 @@ class TestUser(unittest.TestCase):
         )
         self.assertIsInstance(user, CandidateModel)
 
+    def tearDown(self) -> None:
+        super().tearDown()
+        self.db.drop_collection('candidates')
+        self.db.client.close()
 
 if __name__ == "__main__":
     unittest.main()

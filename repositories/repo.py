@@ -1,39 +1,55 @@
-from abc import ABC
+from abc import ABC, abstractmethod
+from typing import Optional
+from bson import ObjectId
+from pymongo.database import Database
 
 
 class IRepo(ABC):
+    @abstractmethod
     def create(self):
         """Create an entry"""
         ...
 
+    @abstractmethod
     def find_one(self):
         """Find unique entry by id"""
         ...
 
-    def find_all(self):
+    @abstractmethod
+    def find(self):
         """Find all entries"""
         ...
 
+    @abstractmethod
     def update_one(self):
         """Update an entry"""
         ...
 
+    @abstractmethod
     def delete_one(self):
         """Delete an entry"""
         ...
 
+
 class BaseRepo(IRepo):
-    def create(self):
-        pass
+    def __init__(self, db: Database, collection_name: str) -> None:
+        super().__init__()
+        self.db = db
+        self.collection = self.db.get_collection(collection_name)
 
-    def find_one(self):
-        pass
+    def create(self, data: dict):
+        return self.collection.insert_one(data).inserted_id
 
-    def find_all(self):
-        pass
+    def find_one(self, id: str):
+        return self.collection.find_one({"_id": ObjectId(id)})
 
-    def update_one(self):
-        pass
+    def find(self, data: Optional[dict]):
+        if data is None:
+            return self.collection.find()
+        return self.collection.find(data)
 
-    def delete_one(self):
-        pass
+    def update_one(self, id: str, data: dict):
+        return self.collection.update_one({"_id": ObjectId(id)}, {"$set": data})
+
+    def delete_one(self, id: str):
+        return self.collection.delete_one({"_id": ObjectId(id)})

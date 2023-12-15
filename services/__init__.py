@@ -1,2 +1,2 @@
-from candidateservice import CandidateService
-from userservice import UserService
+from .candidateservice import CandidateService
+from .userservice import UserService

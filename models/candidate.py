@@ -1,12 +1,15 @@
-from typing import List, Optional
+from typing import Annotated, List, Optional
 import uuid
-from pydantic import BaseModel, ConfigDict, Field
+from bson import ObjectId
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
 
 
 class CandidateModel(BaseModel):
     """Represents a candidate profile"""
 
-    id: Optional[str] = Field(alias="_id", default=None)
+    id: Optional[Annotated[str, BeforeValidator(str)]] = Field(
+        alias="_id", default=None
+    )
     UUID: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()))
     first_name: str
     last_name: str
@@ -89,3 +92,7 @@ class UpdateCandidateModel(BaseModel):
 
 class CandidateListModel(BaseModel):
     candidates: List[CandidateModel] = Field(default=[])
+
+
+class QueryCandidateModel(UpdateCandidateModel):
+    pass

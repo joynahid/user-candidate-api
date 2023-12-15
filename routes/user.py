@@ -10,6 +10,9 @@ router = APIRouter()
 @router.post("/user")
 def create_user(user: UserModel):
     """Create a new user entry to the users collection"""
+
+    user = UserModel()
+
     return JSONResponse(
-        content=user.model_dump_json(), status_code=status.HTTP_201_CREATED
+        content=user.model_dump(), status_code=status.HTTP_201_CREATED
     )

@@ -8,6 +8,15 @@ services:
       MONGO_INITDB_ROOT_USERNAME: nahid
       MONGO_INITDB_ROOT_PASSWORD: nahidpassword
 
+  mongo-test:
+    image: mongo:7.0.4
+    restart: always
+    ports:
+      - 89:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: nahidtest
+      MONGO_INITDB_ROOT_PASSWORD: nahidpasswordtest
+
   # Admin interface for mongo
   # For development purpose only
   mongo-express:
