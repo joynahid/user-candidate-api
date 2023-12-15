@@ -1,18 +1,14 @@
 from http import HTTPStatus
-from fastapi import FastAPI
-from starlette.responses import Response
-
-from models.user import UserModel
+from fastapi import FastAPI, Response
+from routes import candidate_router, user_router
 
 app = FastAPI()
+
+app.include_router(candidate_router)
+app.include_router(user_router)
 
 
 @app.get('/health')
 def index():
     """Simple health check API"""
     return Response(status_code=HTTPStatus.OK)
-
-@app.post('/user')
-def create_user(user: UserModel):
-    """Craete a new user entry to the users collection"""
-    return Response(status_code=HTTPStatus.CREATED)

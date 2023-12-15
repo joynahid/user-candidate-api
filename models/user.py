@@ -7,7 +7,7 @@ class UserModel(BaseModel):
     """Represents a user profile"""
 
     id: Optional[str] = Field(alias="_id", default=None)
-    UUID: Optional[str] = Field(default_factory=uuid.uuid4)
+    UUID: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()))
     first_name: str
     last_name: str
     email: str
