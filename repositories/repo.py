@@ -43,7 +43,7 @@ class BaseRepo(IRepo):
     def find_one(self, id: str):
         return self.collection.find_one({"_id": ObjectId(id)})
 
-    def find(self, data: Optional[dict]):
+    def find(self, data: Optional[dict] = None):
         if data is None:
             return self.collection.find()
         return self.collection.find(data)

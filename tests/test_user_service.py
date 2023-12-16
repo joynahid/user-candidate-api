@@ -1,12 +1,12 @@
 import unittest
 from fastapi.testclient import TestClient
-from main import app
-from models import UserModel
 from config import db, get_database
-from repositories import CandidateRepo
+from main import app
+from repositories import CandidateRepo, UserRepo
+from services import CandidateService, UserService
 
 
-class TestCandidateRepo(unittest.TestCase):
+class TestCandidateService(unittest.TestCase):
     def setUp(self):
         db.init_db(
             "mongodb://nahidtest:nahidpasswordtest@localhost:89/?retryWrites=true&w=majority"
@@ -14,9 +14,9 @@ class TestCandidateRepo(unittest.TestCase):
         self.db = get_database()
         self.client = TestClient(app)
 
-    def test_repo(self):
-        candidate_repo = CandidateRepo(self.db)
-        self.assertIsInstance(candidate_repo, CandidateRepo)
+    def test_user_service(self):
+        service = UserService(UserRepo(self.db))
+        self.assertIsInstance(service, UserService)
 
 
 if __name__ == "__main__":

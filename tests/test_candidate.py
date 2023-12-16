@@ -5,7 +5,7 @@ from main import app
 from models import CandidateModel
 
 
-class TestUser(unittest.TestCase):
+class TestCandidate(unittest.TestCase):
     def setUp(self):
         db.init_db(
             "mongodb://nahidtest:nahidpasswordtest@localhost:89/?retryWrites=true&w=majority"
@@ -29,13 +29,18 @@ class TestUser(unittest.TestCase):
             gender="Male",
         )
 
-        response = self.client.post("/candidate", json=new_candidate)
+        for i in range(5):
+            response = self.client.post("/candidate", json=new_candidate)
+
         self.assertEqual(response.status_code, 201)
         self.assertTrue(response.json()["id"])
 
     def test_update_candidate(self):
+        candidates = self.db.get_collection('candidates').find()
+        test_candidate = list(candidates)[0]
+
         update_candidate = dict(
-            first_name="Avoid",
+            first_name="John",
             last_name="Rafa",
             email="avoidr@nahidhq.com",
             career_level="Junior",
@@ -49,19 +54,27 @@ class TestUser(unittest.TestCase):
             gender="Male",
         )
 
-        response = self.client.put("/candidate/id2", json=update_candidate)
-        self.assertEqual(response.status_code, 200)
-
-    def test_delete_candidate(self):
-        response = self.client.delete("/candidate/id2", params=dict(candidate_id="id1"))
+        response = self.client.put(f"/candidate/{str(test_candidate['_id'])}", json=update_candidate)
         self.assertEqual(response.status_code, 200)
 
     def test_view_candidate(self):
-        response = self.client.delete("/candidate/id2", params=dict(candidate_id="id1"))
+        candidates = self.db.get_collection('candidates').find()
+        test_candidate = list(candidates)[0]
+
+        response = self.client.get(f"/candidate/{str(test_candidate['_id'])}")
         self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data['id'], str(test_candidate['_id']))
 
     def test_get_all_candidates(self):
-        response = self.client.get("/all-candidates", params=dict(candidate_id="id1"))
+        response = self.client.get("/all-candidates")
+        self.assertEqual(response.status_code, 200)
+
+    def test_zdelete_candidate(self):
+        candidates = self.db.get_collection('candidates').find()
+        test_candidate = list(candidates)[0]
+
+        response = self.client.delete(f"/candidate/{str(test_candidate['_id'])}")
         self.assertEqual(response.status_code, 200)
 
     def test_candidate_model(self):
@@ -70,7 +83,6 @@ class TestUser(unittest.TestCase):
             last_name="Hasan",
             email="xyz@nahidhq.com",
             UUID="uuidfiswdghf",
-            _id="90",
             career_level="Junior",
             job_major="Computer Science",
             years_of_experience=5,
@@ -85,7 +97,7 @@ class TestUser(unittest.TestCase):
 
     def tearDown(self) -> None:
         super().tearDown()
-        self.db.drop_collection('candidates')
+        # self.db.drop_collection('candidates')
         self.db.client.close()
 
 if __name__ == "__main__":

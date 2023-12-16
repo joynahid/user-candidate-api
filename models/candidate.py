@@ -1,15 +1,14 @@
-from typing import Annotated, List, Optional
+from typing import List, Optional
 import uuid
-from bson import ObjectId
-from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+from .shared import PyObjectId
 
 
 class CandidateModel(BaseModel):
     """Represents a candidate profile"""
 
-    id: Optional[Annotated[str, BeforeValidator(str)]] = Field(
-        alias="_id", default=None
-    )
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
     UUID: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()))
     first_name: str
     last_name: str
@@ -23,6 +22,10 @@ class CandidateModel(BaseModel):
     city: str
     salary: float
     gender: str  # should be a list of literals: [“Male”, “Female”, “Not Specified”]
+
+    @property
+    def name(self):
+        return " ".join([self.first_name, self.last_name])
 
     model_config = ConfigDict(
         populate_by_name=True,

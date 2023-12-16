@@ -7,4 +7,8 @@ class UserService:
         self.user_repo = user_repo
 
     def create_user(self, user: UserModel) -> UserModel:
-        return user
+        """Create a new user"""
+        user_dict = user.model_dump(exclude=["id"])
+        _id = self.user_repo.create(user_dict)
+        new_user = self.user_repo.find_one(_id)
+        return UserModel(**new_user)

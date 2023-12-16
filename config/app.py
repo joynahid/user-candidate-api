@@ -8,7 +8,7 @@ from config import get_database, read_settings, Settings, close_database
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Do Stuffs
-    settings = Annotated[Settings, Depends(read_settings)]
+    settings: Settings = read_settings()
     db.init_db(settings.mongodb_url)
 
     yield

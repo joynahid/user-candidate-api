@@ -1,32 +1,22 @@
 import unittest
 from fastapi.testclient import TestClient
+from config import db, get_database
 from main import app
-from models import UserModel
+from repositories import CandidateRepo
+from services import CandidateService
 
 
 class TestCandidateService(unittest.TestCase):
     def setUp(self):
+        db.init_db(
+            "mongodb://nahidtest:nahidpasswordtest@localhost:89/?retryWrites=true&w=majority"
+        )
+        self.db = get_database()
         self.client = TestClient(app)
 
-    def test_create_user(self):
-        new_user = dict(
-            first_name="John",
-            last_name="Kabir",
-            email="johnk@nahidhq.com",
-        )
-
-        response = self.client.post("/user", json=new_user)
-        self.assertEqual(response.status_code, 201, 'Status code mismatched')
-
-    def test_user_model(self):
-        user = UserModel(
-            first_name="Nahid",
-            last_name="Hasan",
-            email="xyz@nahidhq.com",
-            UUID="uuidfiswdghf",
-            _id="90",
-        )
-        self.assertIsInstance(user, UserModel)
+    def test_candidate_service(self):
+        service = CandidateService(candidate_repo=CandidateRepo(self.db))
+        self.assertIsInstance(service, CandidateService)
 
 
 if __name__ == "__main__":
