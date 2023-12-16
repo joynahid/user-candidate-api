@@ -25,6 +25,25 @@ Or Locally here after running docker-compose (See below): http://localhost:8181/
 - PyMongo
 - Docker
 
+### `.env` File
+
+## File Location
+- Place the `.env` file in the root directory of your project. You must create this to run the project, otherwise docker-compose will warn and exit.
+
+## Variables
+1. **MONGODB_URL**: Connection string for MongoDB.
+   - Example: `"mongodb://nahid:nahidpassword@mongo/?retryWrites=true&w=majority"`
+
+2. **JWT_SECRET**: Secret key for JWT authentication.
+   - Example: `"mysecret"`
+
+3. **JWT_ALGORITHM**: Algorithm used for JWT.
+   - Example: `"HS256"`
+
+
+You can use the above mentioned values for local running as the docker-compose is already configured with those values.
+
+
 Usage
 ------------
 
