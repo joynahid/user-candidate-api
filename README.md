@@ -3,8 +3,9 @@ Recruit API
 
 This FastAPI application is designed to manage candidate profiles efficiently. The system allows users to create, view, update, and delete candidate profiles. It also supports searching for specific candidates and generating reports.
 
-Check the Swagger Documentation live here:
-Or Locally here after running (See below): http://localhost:8181/docs
+Check the Swagger Documentation live here: http://139.59.202.153/docs
+
+Or Locally here after running docker-compose (See below): http://localhost:8181/docs
 
 ![Swagger Documentation](./assets/swagger.png)
 
