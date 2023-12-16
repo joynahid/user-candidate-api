@@ -25,12 +25,12 @@ Or Locally here after running docker-compose (See below): http://localhost:8181/
 - PyMongo
 - Docker
 
-### `.env` File
+## `.env` File
 
-## File Location
+### File Location
 - Place the `.env` file in the root directory of your project. You must create this to run the project, otherwise docker-compose will warn and exit.
 
-## Variables
+### Variables
 1. **MONGODB_URL**: Connection string for MongoDB.
    - Example: `"mongodb://nahid:nahidpassword@mongo/?retryWrites=true&w=majority"`
 
