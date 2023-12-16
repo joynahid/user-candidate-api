@@ -1,15 +1,25 @@
+from typing import Union
 import unittest
 from fastapi.testclient import TestClient
 from config import db, get_database
 from main import app
-from models import CandidateModel
+from models import CandidateModel, UserModel
+from . import MONGODB_TEST_URL
+from routes.utils import Utils
+
+
+def override_auth_middleware(q: Union[str, None] = None):
+    return UserModel(
+        email="dsfdf", first_name="dsfd", last_name="dfsd", password="dsfdfsd"
+    )
+
+
+app.dependency_overrides[Utils.auth_middleware] = override_auth_middleware
 
 
 class TestCandidate(unittest.TestCase):
     def setUp(self):
-        db.init_db(
-            "mongodb://nahidtest:nahidpasswordtest@localhost:89/?retryWrites=true&w=majority"
-        )
+        db.init_db(MONGODB_TEST_URL)
         self.db = get_database()
         self.client = TestClient(app)
 
@@ -36,7 +46,7 @@ class TestCandidate(unittest.TestCase):
         self.assertTrue(response.json()["id"])
 
     def test_update_candidate(self):
-        candidates = self.db.get_collection('candidates').find()
+        candidates = self.db.get_collection("candidates").find()
         test_candidate = list(candidates)[0]
 
         update_candidate = dict(
@@ -54,24 +64,26 @@ class TestCandidate(unittest.TestCase):
             gender="Male",
         )
 
-        response = self.client.put(f"/candidate/{str(test_candidate['_id'])}", json=update_candidate)
+        response = self.client.put(
+            f"/candidate/{str(test_candidate['_id'])}", json=update_candidate
+        )
         self.assertEqual(response.status_code, 200)
 
     def test_view_candidate(self):
-        candidates = self.db.get_collection('candidates').find()
+        candidates = self.db.get_collection("candidates").find()
         test_candidate = list(candidates)[0]
 
         response = self.client.get(f"/candidate/{str(test_candidate['_id'])}")
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        self.assertEqual(data['id'], str(test_candidate['_id']))
+        self.assertEqual(data["id"], str(test_candidate["_id"]))
 
     def test_get_all_candidates(self):
         response = self.client.get("/all-candidates")
         self.assertEqual(response.status_code, 200)
 
     def test_zdelete_candidate(self):
-        candidates = self.db.get_collection('candidates').find()
+        candidates = self.db.get_collection("candidates").find()
         test_candidate = list(candidates)[0]
 
         response = self.client.delete(f"/candidate/{str(test_candidate['_id'])}")
@@ -99,6 +111,7 @@ class TestCandidate(unittest.TestCase):
         super().tearDown()
         # self.db.drop_collection('candidates')
         self.db.client.close()
+
 
 if __name__ == "__main__":
     unittest.main()

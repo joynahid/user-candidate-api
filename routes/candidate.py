@@ -1,21 +1,31 @@
 import csv
 import io
-from typing import Optional, Union
+from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Response, status
 from fastapi.responses import JSONResponse
 from config import get_database
-
+from models.user import UserModel
+from .utils import Utils
 from models import CandidateModel, UpdateCandidateModel, CandidateListModel
-from models.candidate import QueryCandidateModel
 from models.shared import PyObjectId
 from repositories import CandidateRepo
 from services import CandidateService
 
 router = APIRouter()
 
+openapi_extra = {
+    "security": {
+        "cookieAuth": {"type": "apiKey", "in": "cookie", "name": "access_token"}
+    }
+}
 
-@router.post("/candidate", response_model=CandidateModel)
-def create_candidate(candidate: CandidateModel, db=Depends(get_database)):
+
+@router.post("/candidate", response_model=CandidateModel, openapi_extra=openapi_extra)
+def create_candidate(
+    candidate: CandidateModel,
+    user: Annotated[UserModel, Depends(Utils.auth_middleware)],
+    db=Depends(get_database),
+):
     """Create a new candidate entry to the candidates collection"""
 
     candidate_repo = CandidateRepo(db)
@@ -28,9 +38,14 @@ def create_candidate(candidate: CandidateModel, db=Depends(get_database)):
     )
 
 
-@router.put("/candidate/{id}", response_model=CandidateModel)
+@router.put(
+    "/candidate/{id}", response_model=CandidateModel, openapi_extra=openapi_extra
+)
 def update_candidate(
-    id: PyObjectId, candidate: UpdateCandidateModel, db=Depends(get_database)
+    id: PyObjectId,
+    candidate: UpdateCandidateModel,
+    user: Annotated[UserModel, Depends(Utils.auth_middleware)],
+    db=Depends(get_database),
 ):
     """Update a candidate entry"""
 
@@ -44,8 +59,14 @@ def update_candidate(
     )
 
 
-@router.get("/candidate/{id}", response_model=CandidateModel)
-def view_candidate(id: PyObjectId, db=Depends(get_database)):
+@router.get(
+    "/candidate/{id}", response_model=CandidateModel, openapi_extra=openapi_extra
+)
+def view_candidate(
+    id: PyObjectId,
+    user: Annotated[UserModel, Depends(Utils.auth_middleware)],
+    db=Depends(get_database),
+):
     """Return a candidate"""
     candidate_repo = CandidateRepo(db)
     candidate_service = CandidateService(candidate_repo)
@@ -56,8 +77,12 @@ def view_candidate(id: PyObjectId, db=Depends(get_database)):
     )
 
 
-@router.delete("/candidate/{id}")
-def delete_candidate(id: PyObjectId, db=Depends(get_database)):
+@router.delete("/candidate/{id}", openapi_extra=openapi_extra)
+def delete_candidate(
+    id: PyObjectId,
+    user: Annotated[UserModel, Depends(Utils.auth_middleware)],
+    db=Depends(get_database),
+):
     """Delete a candidate from the candidates collection"""
 
     candidate_repo = CandidateRepo(db)
@@ -67,8 +92,11 @@ def delete_candidate(id: PyObjectId, db=Depends(get_database)):
     return Response(status_code=status.HTTP_200_OK)
 
 
-@router.get("/all-candidates", response_model=CandidateListModel)
+@router.get(
+    "/all-candidates", response_model=CandidateListModel, openapi_extra=openapi_extra
+)
 def get_all_candidates(
+    user: Annotated[UserModel, Depends(Utils.auth_middleware)],
     search: Optional[str] = None,
     db=Depends(get_database),
 ):
@@ -90,8 +118,13 @@ def get_all_candidates(
     )
 
 
-@router.get("/generate-report")
-def generate_report(
+@router.get(
+    "/generate-report",
+    description="Generate a CSV Report of all candidates",
+    openapi_extra=openapi_extra,
+)
+def generate_csv_report(
+    user: Annotated[UserModel, Depends(Utils.auth_middleware)],
     db=Depends(get_database),
 ):
     """

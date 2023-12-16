@@ -4,12 +4,13 @@ from main import app
 from models import UserModel
 from config import db, get_database
 from repositories import CandidateRepo, UserRepo
+from . import MONGODB_TEST_URL
 
 
 class TestUserRepo(unittest.TestCase):
     def setUp(self):
         db.init_db(
-            "mongodb://nahidtest:nahidpasswordtest@localhost:89/?retryWrites=true&w=majority"
+            MONGODB_TEST_URL
         )
         self.db = get_database()
         self.client = TestClient(app)

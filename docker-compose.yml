@@ -29,6 +29,14 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: nahidpassword
       ME_CONFIG_MONGODB_URL: mongodb://nahid:nahidpassword@mongo:27017/
 
+  fastapi-test:
+    build: .
+    depends_on:
+      - mongo-test
+    command: python -m unittest
+    volumes:
+      - ./:/app
+
   fastapi:
     build: .
     env_file:
